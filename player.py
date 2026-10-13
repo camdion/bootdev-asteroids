@@ -1,3 +1,4 @@
+from pygame.key import ScancodeWrapper
 from shot import Shot
 import pygame
 
@@ -11,6 +12,7 @@ class Player(CircleShape):
         super().__init__(pos_x, pos_y, PLAYER_RADIUS)
         self.__rotation = 0
         self.__timer = 0.0
+        self.__velocity = float(PLAYER_SPEED)
 
     def triangle(self) -> list[pygame.Vector2]:
         forward = pygame.Vector2(0, 1).rotate(self.__rotation)
@@ -35,8 +37,10 @@ class Player(CircleShape):
             self.rotate(-dt)
         if keys[pygame.K_w]:
             self.move(dt)
+            self.__velocity *= PLAYER_ACCELERATION
         if keys[pygame.K_s]:
             self.move(-dt)
+            self.__velocity *= PLAYER_ACCELERATION
         if keys[pygame.K_SPACE]:
             self.shoot()
 
@@ -44,7 +48,7 @@ class Player(CircleShape):
 
     def move(self, dt: float) -> None:
         dir = pygame.Vector2(0, 1).rotate(self.__rotation)
-        self.position += dir * PLAYER_SPEED * dt
+        self.position += dir * self.__velocity * dt
 
     def shoot(self) -> None:
         if self.__timer > 0:
@@ -53,3 +57,6 @@ class Player(CircleShape):
             self.__timer = PLAYER_SHOOT_COOLDOWN_SECONDS
             bullet = Shot(self.position.x, self.position.y)
             bullet.velocity = pygame.Vector2(0, 1).rotate(self.__rotation) * PLAYER_SHOOT_SPEED
+
+    def reset_speed(self) -> None:
+        self.__velocity = PLAYER_SPEED

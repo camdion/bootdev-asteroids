@@ -7,6 +7,7 @@ from player import Player
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from shot import Shot
+from scoreboard import Scoreboard
 
 def main():
     # Setting up the clock
@@ -31,6 +32,10 @@ def main():
     # Shots
     Shot.containers = (shots, drawable, updatable)
 
+    # Scoreboard
+    Scoreboard.containers = (drawable)
+    sb = Scoreboard()
+
     # Initializing pygame and displaying info on start
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -45,6 +50,8 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
+            if event.type == pygame.KEYUP and (event.key == pygame.K_w or event.key == pygame.K_s):
+                player.reset_speed()
 
 
         screen.fill("black")
@@ -62,8 +69,8 @@ def main():
                 if asteroid.collides_with(shot):
                     log_event("asteroid_shot")
                     shot.kill()
-                    asteroid.kill()
-
+                    points = asteroid.split()
+                    sb.add_points(points)
 
         # Display screen
         pygame.display.flip()
